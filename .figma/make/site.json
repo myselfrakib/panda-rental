@@ -1,0 +1,10 @@
+{
+  "description": "Connect with Panda Bike Rental in Digha, West Bengal to easily browse, book, and manage motorcycle rentals for your adventures.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
