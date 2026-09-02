@@ -1,14 +1,10 @@
-import { useState, useRef, useEffect } from "react"
-import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  GoogleAuthProvider,
-  signInWithPopup,
-  onAuthStateChanged,
-  signOut,
-  type ConfirmationResult,
-} from "firebase/auth"
-import { auth } from "./firebase"
+import { useState } from "react"
+
+// ── Demo Types ────────────────────────────────────────────────────────────────
+
+export type ConfirmationResult = {
+  confirm: (otp: string) => Promise<void>
+}
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -1215,24 +1211,11 @@ function OtpScreen({
 // ── App ───────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  // "loading" = checking auth state on mount
-  const [authStep, setAuthStep] = useState<"loading" | "login" | "otp" | "main">("loading")
+  const [authStep, setAuthStep] = useState<"loading" | "login" | "otp" | "main">("main")
   const [authPhone, setAuthPhone] = useState("")
   const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null)
   const [tab, setTab] = useState("home")
   const [selectedBike, setSelectedBike] = useState<Bike | null>(null)
-
-  // Listen for Firebase auth state — auto-login on page refresh
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setAuthStep("main")
-      } else {
-        setAuthStep((prev) => prev === "loading" ? "login" : prev)
-      }
-    })
-    return unsub
-  }, [])
 
   const tabs = [
     { id: "home", label: "Home", Icon: IconHome },
@@ -1245,8 +1228,7 @@ export default function App() {
     setTab(t)
   }
 
-  async function handleSignOut() {
-    await signOut(auth)
+  function handleSignOut() {
     setAuthStep("login")
     setTab("home")
   }
@@ -1333,19 +1315,17 @@ export default function App() {
                 </svg>
                 <span className="font-semibold text-sm">Call Us</span>
               </a>
-              {auth.currentUser && (
-                <button
-                  onClick={handleSignOut}
-                  className="flex items-center gap-2.5 bg-ink-raised border border-ink-border rounded-xl px-4 py-3 text-muted hover:text-sand transition-colors"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-                    <polyline points="16 17 21 12 16 7" />
-                    <line x1="21" y1="12" x2="9" y2="12" />
-                  </svg>
-                  <span className="font-semibold text-sm">Sign Out</span>
-                </button>
-              )}
+              <button
+                onClick={handleSignOut}
+                className="flex items-center gap-2.5 bg-ink-raised border border-ink-border rounded-xl px-4 py-3 text-muted hover:text-sand transition-colors"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                <span className="font-semibold text-sm">Sign Out</span>
+              </button>
             </div>
           </aside>
 
