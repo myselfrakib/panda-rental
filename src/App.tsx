@@ -15,7 +15,7 @@ const BIKES = [
     type: "Cruiser",
     price: 800,
     cc: 350,
-    img: "https://images.unsplash.com/photo-1564594387897-c2a7adfd2b1b?w=600&h=380&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1550149551-ee7bd0e3de7c?w=600&h=380&fit=crop&auto=format",
     available: true,
     badge: "Popular",
     fuel: "35 kmpl",
@@ -26,7 +26,7 @@ const BIKES = [
     type: "Sports",
     price: 600,
     cc: 160,
-    img: "https://images.unsplash.com/photo-1783791088800-966ed574f664?w=600&h=380&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=600&h=380&fit=crop&auto=format",
     available: true,
     badge: "",
     fuel: "45 kmpl",
@@ -37,7 +37,7 @@ const BIKES = [
     type: "Commuter",
     price: 450,
     cc: 125,
-    img: "https://images.unsplash.com/photo-1763270204968-0b49cc03efbc?w=600&h=380&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=600&h=380&fit=crop&auto=format",
     available: true,
     badge: "Best Value",
     fuel: "60 kmpl",
@@ -48,7 +48,7 @@ const BIKES = [
     type: "Sports",
     price: 750,
     cc: 200,
-    img: "https://images.unsplash.com/photo-1556036518-705db5129896?w=600&h=380&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1558981359-219d6364c9c8?w=600&h=380&fit=crop&auto=format",
     available: false,
     badge: "",
     fuel: "40 kmpl",
@@ -59,7 +59,7 @@ const BIKES = [
     type: "Cruiser",
     price: 900,
     cc: 350,
-    img: "https://images.unsplash.com/photo-1771402563765-0bfd3dd6d2d7?w=600&h=380&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1558980664-10e7170b5df9?w=600&h=380&fit=crop&auto=format",
     available: true,
     badge: "Premium",
     fuel: "36 kmpl",
@@ -70,7 +70,7 @@ const BIKES = [
     type: "Street",
     price: 550,
     cc: 149,
-    img: "https://images.unsplash.com/photo-1556036518-705db5129896?w=600&h=380&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=380&fit=crop&auto=format",
     available: true,
     badge: "",
     fuel: "48 kmpl",
@@ -84,7 +84,7 @@ const ROUTES = [
     distance: "14 km",
     duration: "25 min",
     difficulty: "Easy",
-    img: "https://images.unsplash.com/photo-1770703674674-79d3e536a4a6?w=600&h=360&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop&auto=format",
     desc: "A quiet fishing village with a pristine beach, perfect for a short morning ride along the shoreline.",
     highlights: ["Fish market at sunrise", "Coconut shacks", "Seashore cycling track"],
   },
@@ -94,7 +94,7 @@ const ROUTES = [
     distance: "25 km",
     duration: "40 min",
     difficulty: "Easy",
-    img: "https://images.unsplash.com/photo-1775132693217-32c5c775adfd?w=600&h=360&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=600&h=360&fit=crop&auto=format",
     desc: "Undisturbed golden sands lined with casuarina trees — almost no crowds, just the sound of waves.",
     highlights: ["Casuarina groves", "Bird watching", "Bonfire evenings"],
   },
@@ -104,7 +104,7 @@ const ROUTES = [
     distance: "45 km",
     duration: "1 hr",
     difficulty: "Moderate",
-    img: "https://images.unsplash.com/photo-1778410350863-20fa393261f8?w=600&h=360&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1509233725247-49e657c54213?w=600&h=360&fit=crop&auto=format",
     desc: "Ride directly on the sand — one of India's longest drivable beaches, famous for red crabs.",
     highlights: ["Beach riding on sand", "Red crab colony", "Fresh seafood restaurants"],
   },
@@ -114,7 +114,7 @@ const ROUTES = [
     distance: "30 km",
     duration: "50 min",
     difficulty: "Easy",
-    img: "https://images.unsplash.com/photo-1770703674674-79d3e536a4a6?w=600&h=360&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=600&h=360&fit=crop&auto=format",
     desc: "Mangrove groves and a secluded cove where dolphins occasionally swim close to shore.",
     highlights: ["Mangrove walks", "Dolphin sightings", "Old lighthouse"],
   },
@@ -224,6 +224,10 @@ function HomeScreen({ setTab }: { setTab: SetTab }) {
           src="/Screenshot 2026-09-01 230254.png"
           alt="Motorcycle parked by the ocean at Digha beach"
           className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src =
+              "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=1600&h=900&fit=crop&auto=format"
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
 
@@ -398,7 +402,7 @@ function HomeScreen({ setTab }: { setTab: SetTab }) {
       <div className="mx-5 md:mx-10 mb-6">
         <div className="relative rounded-3xl overflow-hidden h-36 md:h-52 bg-ink-raised">
           <img
-            src="https://images.unsplash.com/photo-1780926539659-2ecaa95b2f62?w=700&h=300&fit=crop&auto=format"
+            src="https://images.unsplash.com/photo-1578674735166-48bcaef9842b?w=900&h=400&fit=crop&auto=format"
             alt="Motorcycle on coastal cliff at sunset"
             className="w-full h-full object-cover opacity-50"
           />
@@ -950,7 +954,7 @@ function LoginScreen({
       {/* Hero image — 52% height on mobile top, full-height left column on desktop */}
       <div className="relative flex-shrink-0 h-[52%] md:h-auto md:w-1/2">
         <img
-          src="https://images.unsplash.com/photo-1780926539659-2ecaa95b2f62?w=800&h=900&fit=crop&auto=format"
+          src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=900&h=1000&fit=crop&auto=format"
           alt="Motorcycle on coastal cliff at Digha"
           className="w-full h-full object-cover"
         />
@@ -1126,7 +1130,7 @@ function OtpScreen({
         <div className="relative">
           <div className="absolute inset-0 opacity-20">
             <img
-              src="https://images.unsplash.com/photo-1779636447852-9febc139fb47?w=600&h=300&fit=crop&auto=format"
+              src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=400&fit=crop&auto=format"
               alt=""
               className="w-full h-full object-cover"
             />
