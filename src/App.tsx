@@ -221,9 +221,9 @@ function HomeScreen({ setTab }: { setTab: SetTab }) {
       {/* Hero */}
       <div className="relative h-[300px] md:h-[500px] bg-ink-raised flex-shrink-0">
         <img
-          src="/Screenshot 2026-09-01 230254.png"
-          alt="Motorcycle parked by the ocean at Digha beach"
-          className="w-full h-full object-cover"
+          src="/hero-banner.png"
+          alt="Panda Bike Rental Store and Banner in Digha"
+          className="w-full h-full object-cover object-center"
           onError={(e) => {
             e.currentTarget.src =
               "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=1600&h=900&fit=crop&auto=format"
