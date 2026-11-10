@@ -396,7 +396,61 @@ type SetBike = (b: Bike | null) => void
 
 // ── Home Screen ───────────────────────────────────────────────────────────────
 
-function HomeScreen({ setTab }: { setTab: SetTab }) {
+function HomeScreen({
+  setTab,
+  setSelectedBike,
+}: {
+  setTab: SetTab
+  setSelectedBike?: SetBike
+}) {
+  const [category, setCategory] = useState("All")
+
+  const todayStr = useMemo(() => {
+    const d = new Date()
+    return d.toISOString().split("T")[0]
+  }, [])
+
+  const [pickupDate, setPickupDate] = useState(todayStr)
+  const [pickupTime, setPickupTime] = useState("09:00 AM")
+  const [durationDays, setDurationDays] = useState(1)
+
+  const timeSlots = [
+    "06:00 AM",
+    "07:00 AM",
+    "08:00 AM",
+    "09:00 AM",
+    "10:00 AM",
+    "11:00 AM",
+    "12:00 PM",
+    "02:00 PM",
+    "04:00 PM",
+    "06:00 PM",
+    "08:00 PM",
+  ]
+
+  const categories = [
+    { id: "All", label: "All Categories (6 Models)" },
+    { id: "Cruiser", label: "Cruiser (Royal Enfield)" },
+    { id: "Sports", label: "Sports (Apache, Pulsar)" },
+    { id: "Commuter", label: "Commuter (Honda SP)" },
+    { id: "Street", label: "Street (Yamaha FZ)" },
+  ]
+
+  const filteredBikes = useMemo(() => {
+    return BIKES.filter((b) => {
+      if (category !== "All" && b.type !== category) return false
+      return true
+    })
+  }, [category])
+
+  function handleSearch(e?: React.FormEvent) {
+    if (e) e.preventDefault()
+    const el = document.getElementById("search-results-section")
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
   return (
     <div className="flex flex-col">
       {/* Hero */}
@@ -470,90 +524,246 @@ function HomeScreen({ setTab }: { setTab: SetTab }) {
         ))}
       </div>
 
-      {/* Why us */}
-      <div className="px-5 md:px-10 py-5 md:py-8">
-        <h2 className="font-display font-bold text-sand text-lg md:text-2xl mb-4">Why Ride with Us?</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
-          {[
-            { icon: "🕐", title: "24/7 Pickup", desc: "Flexible pickup and drop-off, any hour of the day." },
-            { icon: "💰", title: "Best Rates", desc: "Starting at ₹450/day with zero hidden charges." },
-            { icon: "🔧", title: "Serviced Bikes", desc: "Every bike inspected before and after each rental." },
-            { icon: "🗺️", title: "Route Guides", desc: "Get curated coastal route maps from local riders." },
-          ].map((f) => (
-            <div key={f.title} className="bg-ink-card border border-ink-border rounded-2xl p-4 md:p-5">
-              <span className="text-2xl mb-2 block">{f.icon}</span>
-              <h3 className="text-sand font-semibold text-sm md:text-base mb-1">{f.title}</h3>
-              <p className="text-muted text-xs leading-relaxed">{f.desc}</p>
+      {/* ── Search Widget (WaveRide Style) ── */}
+      <div className="px-5 md:px-10 py-6 md:py-8">
+        <div className="bg-ink-card border border-ink-border rounded-3xl p-5 md:p-7 shadow-[0_8px_32px_rgba(0,0,0,0.15)] relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand/20 via-brand to-brand/20" />
+
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-5">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="bg-brand/15 text-brand text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  Instant Rental Search
+                </span>
+                <span className="text-muted text-xs">Self-Drive Bikes · Digha</span>
+              </div>
+              <h2 className="font-display font-bold text-sand text-lg md:text-2xl">
+                Find Your Ride
+              </h2>
             </div>
-          ))}
+            <p className="text-muted text-xs md:text-sm">
+              Free helmets · Zero security deposit · Pay at pickup
+            </p>
+          </div>
+
+          <form onSubmit={handleSearch} className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+              {/* 1. Vehicle Category */}
+              <div>
+                <label className="text-sand text-xs font-semibold mb-1.5 flex items-center gap-1.5">
+                  <span>🏍️</span>
+                  <span>Select Vehicle Category</span>
+                </label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  style={{ colorScheme: "dark" }}
+                  className="w-full bg-ink-raised border border-ink-border text-sand rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand transition-colors h-[46px]"
+                >
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 2. Pickup Date */}
+              <div>
+                <label className="text-sand text-xs font-semibold mb-1.5 flex items-center gap-1.5">
+                  <span>📅</span>
+                  <span>Pickup Date</span>
+                </label>
+                <input
+                  type="date"
+                  value={pickupDate}
+                  min={todayStr}
+                  onChange={(e) => setPickupDate(e.target.value)}
+                  style={{ colorScheme: "dark" }}
+                  className="w-full bg-ink-raised border border-ink-border text-sand rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand transition-colors h-[46px]"
+                />
+              </div>
+
+              {/* 3. Pickup Time */}
+              <div>
+                <label className="text-sand text-xs font-semibold mb-1.5 flex items-center gap-1.5">
+                  <span>⏰</span>
+                  <span>Pickup Time</span>
+                </label>
+                <select
+                  value={pickupTime}
+                  onChange={(e) => setPickupTime(e.target.value)}
+                  style={{ colorScheme: "dark" }}
+                  className="w-full bg-ink-raised border border-ink-border text-sand rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand transition-colors h-[46px]"
+                >
+                  {timeSlots.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 4. Duration (Days) with Plus / Minus Button */}
+              <div>
+                <label className="text-sand text-xs font-semibold mb-1.5 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span>⏳</span>
+                    <span>Rental Duration</span>
+                  </span>
+                  <span className="text-brand text-[11px] font-bold">
+                    {durationDays} {durationDays === 1 ? "day" : "days"}
+                  </span>
+                </label>
+                <div className="flex items-center justify-between bg-ink-raised border border-ink-border rounded-xl px-2 h-[46px]">
+                  <button
+                    type="button"
+                    onClick={() => setDurationDays((d) => Math.max(1, d - 1))}
+                    disabled={durationDays <= 1}
+                    className="w-9 h-9 rounded-lg bg-ink-card hover:bg-brand/20 active:scale-95 text-sand font-bold text-lg disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-all border border-ink-border"
+                    title="Decrease duration"
+                  >
+                    −
+                  </button>
+                  <span className="font-display font-bold text-sand text-sm tabular-nums px-2">
+                    {durationDays} {durationDays === 1 ? "Day" : "Days"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setDurationDays((d) => Math.min(30, d + 1))}
+                    disabled={durationDays >= 30}
+                    className="w-9 h-9 rounded-lg bg-ink-card hover:bg-brand/20 active:scale-95 text-sand font-bold text-lg disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-all border border-ink-border"
+                    title="Increase duration"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Search Submit Bar */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="text-muted text-xs flex flex-wrap items-center gap-2">
+                <span>✓ Pay at Pickup</span>
+                <span>•</span>
+                <span>✓ Unlimited Kilometers</span>
+                <span>•</span>
+                <span>✓ Verified Inspected Bikes</span>
+              </div>
+              <button
+                type="submit"
+                className="w-full sm:w-auto min-w-[220px] bg-brand text-white font-display font-bold py-3 px-8 rounded-xl text-sm shadow-[0_4px_16px_rgba(249,115,22,0.35)] hover:bg-brand/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              >
+                <span>🔍</span>
+                <span>Search Available Bikes</span>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
 
-      {/* Quick fleet preview */}
-      <div className="px-5 md:px-10 pb-5">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-display font-bold text-sand text-lg md:text-2xl">Our Bikes</h2>
-          <button onClick={() => setTab("fleet")} className="text-brand text-sm font-medium">
-            See all →
+      {/* ── Search Results ── */}
+      <div id="search-results-section" className="px-5 md:px-10 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h2 className="font-display font-bold text-sand text-lg md:text-2xl flex items-center gap-2">
+              <span>Matching Available Bikes</span>
+              <span className="text-brand text-xs font-semibold bg-brand/15 px-2.5 py-0.5 rounded-full">
+                {filteredBikes.length} Models
+              </span>
+            </h2>
+            <p className="text-muted text-xs mt-0.5">
+              Rates calculated for <span className="text-sand font-semibold">{durationDays} {durationDays === 1 ? "day" : "days"}</span> starting <span className="text-sand font-semibold">{pickupDate}</span> at <span className="text-sand font-semibold">{pickupTime}</span>
+            </p>
+          </div>
+          <button
+            onClick={() => setTab("fleet")}
+            className="text-brand hover:underline text-xs font-semibold flex items-center gap-1 self-start sm:self-auto"
+          >
+            <span>See entire fleet</span>
+            <span>→</span>
           </button>
         </div>
 
-        {/* Mobile: horizontal scroll */}
-        <div className="md:hidden flex gap-3 overflow-x-auto no-scrollbar -mx-5 px-5 pb-1">
-          {BIKES.filter((b) => b.available).slice(0, 4).map((bike) => (
-            <div
-              key={bike.id}
-              className="min-w-[185px] bg-ink-card border border-ink-border rounded-2xl overflow-hidden flex-shrink-0"
-            >
-              <div className="relative h-28 bg-ink-raised">
-                <img src={bike.img} alt={bike.name} className="w-full h-full object-cover" />
-                {bike.badge && (
-                  <span className="absolute top-2 left-2 bg-brand text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                    {bike.badge}
-                  </span>
-                )}
-              </div>
-              <div className="p-3">
-                <p className="text-sand font-semibold text-xs leading-tight mb-2">{bike.name}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-brand font-display font-bold text-sm">
-                    ₹{bike.price}
-                    <span className="text-muted font-body font-normal text-[10px]">/day</span>
-                  </span>
-                  <span className="text-muted text-[10px] bg-ink-raised px-2 py-0.5 rounded-full">{bike.cc}cc</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* Bike Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredBikes.map((bike) => {
+            const totalPrice = bike.price * durationDays
 
-        {/* Desktop: grid */}
-        <div className="hidden md:grid grid-cols-3 lg:grid-cols-4 gap-4">
-          {BIKES.filter((b) => b.available).slice(0, 4).map((bike) => (
-            <div
-              key={bike.id}
-              className="bg-ink-card border border-ink-border rounded-2xl overflow-hidden"
-            >
-              <div className="relative h-36 bg-ink-raised">
-                <img src={bike.img} alt={bike.name} className="w-full h-full object-cover" />
-                {bike.badge && (
-                  <span className="absolute top-2 left-2 bg-brand text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                    {bike.badge}
-                  </span>
-                )}
-              </div>
-              <div className="p-3">
-                <p className="text-sand font-semibold text-sm leading-tight mb-2">{bike.name}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-brand font-display font-bold text-base">
-                    ₹{bike.price}
-                    <span className="text-muted font-body font-normal text-xs">/day</span>
-                  </span>
-                  <span className="text-muted text-xs bg-ink-raised px-2 py-0.5 rounded-full">{bike.cc}cc</span>
+            return (
+              <div
+                key={bike.id}
+                className="bg-ink-card border border-ink-border hover:border-brand/40 rounded-2xl overflow-hidden transition-all duration-200 flex flex-col"
+              >
+                <div className="relative h-44 bg-ink-raised overflow-hidden">
+                  <img
+                    src={bike.img}
+                    alt={bike.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src =
+                        "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=600&h=380&fit=crop&auto=format"
+                    }}
+                  />
+                  {bike.badge && (
+                    <span className="absolute top-2.5 left-2.5 bg-brand text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow">
+                      {bike.badge}
+                    </span>
+                  )}
+                  <div className="absolute bottom-2.5 right-2.5 bg-black/60 backdrop-blur-sm rounded-full px-2.5 py-1">
+                    <span className="text-white text-xs font-medium">{bike.cc}cc</span>
+                  </div>
+                  {!bike.available && (
+                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+                      <span className="bg-red-500/90 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        Currently Booked
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-4 flex flex-col flex-1 justify-between">
+                  <div>
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <div>
+                        <h3 className="text-sand font-semibold text-base leading-snug">{bike.name}</h3>
+                        <span className="text-brand text-xs font-medium">{bike.type}</span>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <span className="text-muted text-[10px] block leading-tight">Total for {durationDays} {durationDays === 1 ? "day" : "days"}</span>
+                        <span className="text-brand font-display font-bold text-lg">
+                          ₹{totalPrice.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 text-muted text-xs mt-2 mb-3 bg-ink-raised px-3 py-2 rounded-xl">
+                      <span>⛽ {bike.fuel}</span>
+                      <span>•</span>
+                      <span>👥 2 Seats</span>
+                      <span>•</span>
+                      <span className="text-sand font-medium">₹{bike.price}/day</span>
+                    </div>
+                  </div>
+
+                  <button
+                    disabled={!bike.available}
+                    onClick={() => {
+                      setSelectedBike?.(bike)
+                      setTab("book")
+                    }}
+                    className={`w-full py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                      bike.available
+                        ? "bg-brand text-white hover:bg-brand/90 active:scale-[0.98] shadow-sm"
+                        : "bg-ink-raised text-muted cursor-not-allowed"
+                    }`}
+                  >
+                    {bike.available ? `Book for ₹${totalPrice.toLocaleString()}` : "Not Available"}
+                  </button>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 
@@ -2075,7 +2285,7 @@ export default function App() {
 
           {/* ── Screen content ── */}
           <div className="flex-1 overflow-y-auto no-scrollbar min-h-0">
-            {tab === "home" && <HomeScreen setTab={goTo} />}
+            {tab === "home" && <HomeScreen setTab={goTo} setSelectedBike={setSelectedBike} />}
             {tab === "fleet" && <FleetScreen setTab={goTo} setSelectedBike={setSelectedBike} />}
             {tab === "routes" && <RoutesScreen setTab={goTo} setSelectedBike={setSelectedBike} />}
             {tab === "book" && <BookScreen selectedBike={selectedBike} />}
