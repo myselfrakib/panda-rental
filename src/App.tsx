@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 
 // ── Demo Types ────────────────────────────────────────────────────────────────
 
@@ -77,46 +77,227 @@ const BIKES = [
   },
 ]
 
-const ROUTES = [
+export type RouteItem = {
+  id: number
+  name: string
+  tag: string
+  category: "Beaches" | "Adventure" | "Nature" | "Culture & Food"
+  distance: string
+  distanceKm: number
+  duration: string
+  difficulty: "Easy" | "Moderate" | "Scenic"
+  roadCondition: string
+  bestTime: string
+  fuelEst: string
+  mapQuery: string
+  img: string
+  desc: string
+  highlights: string[]
+  insiderTip: string
+  recommendedBikeId: number
+  recommendedBikeName: string
+}
+
+const ROUTES: RouteItem[] = [
   {
     id: 1,
-    name: "Shankarpur Beach",
-    distance: "14 km",
-    duration: "25 min",
+    name: "Udaipur Beach",
+    tag: "Bengal-Odisha Border",
+    category: "Beaches",
+    distance: "3.5 km",
+    distanceKm: 3.5,
+    duration: "10 min",
     difficulty: "Easy",
-    img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop&auto=format",
-    desc: "A quiet fishing village with a pristine beach, perfect for a short morning ride along the shoreline.",
-    highlights: ["Fish market at sunrise", "Coconut shacks", "Seashore cycling track"],
+    roadCondition: "Smooth coastal tarmac with sea breeze",
+    bestTime: "5:30 AM – 8:00 AM (Sunrise) or 4:30 PM",
+    fuelEst: "₹30 – ₹50",
+    mapQuery: "Udaipur Beach, Digha, West Bengal Odisha Border",
+    img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=700&h=420&fit=crop&auto=format",
+    desc: "A quiet virgin beach located right on the West Bengal – Odisha border, fringed with casuarina pine groves. Famous for fresh green coconuts, red sand crabs, and beachside fried fish shacks.",
+    highlights: [
+      "Scenic interstate border coastal ride",
+      "Thousands of red ghost crabs at dawn",
+      "Fresh tender coconut & fried fish shacks",
+      "Jet ski, quad bike (ATV) & banana rides",
+    ],
+    insiderTip: "Ride early at 6 AM before tourist crowds arrive. The flat damp sand near the Odisha border post is the best spot for bike photoshoot reels.",
+    recommendedBikeId: 5,
+    recommendedBikeName: "Royal Enfield Hunter 350",
   },
   {
     id: 2,
-    name: "Tajpur Beach",
-    distance: "25 km",
-    duration: "40 min",
+    name: "Old Digha Sea Beach & Rock Dyke",
+    tag: "Iconic Sea Wall & Food",
+    category: "Culture & Food",
+    distance: "2.5 km",
+    distanceKm: 2.5,
+    duration: "8 min",
     difficulty: "Easy",
-    img: "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=600&h=360&fit=crop&auto=format",
-    desc: "Undisturbed golden sands lined with casuarina trees — almost no crowds, just the sound of waves.",
-    highlights: ["Casuarina groves", "Bird watching", "Bonfire evenings"],
+    roadCondition: "Wide paved town promenade with street lights",
+    bestTime: "5:00 PM – 9:00 PM (Evening buzz)",
+    fuelEst: "₹25 – ₹40",
+    mapQuery: "Old Digha Sea Beach, Digha, West Bengal",
+    img: "https://images.unsplash.com/photo-1509233725247-49e657c54213?w=700&h=420&fit=crop&auto=format",
+    desc: "The historic seafront of Digha protected by towering concrete boulders. Watch roaring waves crash with salty sea spray, then explore the sizzling fish fry stalls and cashew markets.",
+    highlights: [
+      "Crashing high-tide ocean waves on sea dyke boulders",
+      "Famous fried fish market (Pomfret, Bhetki & Prawns)",
+      "Nehru Market cashew nut & seashell bazaars",
+      "Lively evening beach promenade atmosphere",
+    ],
+    insiderTip: "High tide creates breathtaking dramatic splashes over the sea wall boulders. Park near Biswa Bangla gate and enjoy piping hot fried pomfret by the shore.",
+    recommendedBikeId: 3,
+    recommendedBikeName: "Honda SP 125",
   },
   {
     id: 3,
-    name: "Mandarmani",
-    distance: "45 km",
-    duration: "1 hr",
-    difficulty: "Moderate",
-    img: "https://images.unsplash.com/photo-1509233725247-49e657c54213?w=600&h=360&fit=crop&auto=format",
-    desc: "Ride directly on the sand — one of India's longest drivable beaches, famous for red crabs.",
-    highlights: ["Beach riding on sand", "Red crab colony", "Fresh seafood restaurants"],
+    name: "Talsari Beach & Subarnarekha Estuary",
+    tag: "River Meets the Bay (Odisha)",
+    category: "Nature",
+    distance: "9 km",
+    distanceKm: 9,
+    duration: "20 min",
+    difficulty: "Scenic",
+    roadCondition: "Picturesque country road shaded by coconut palms",
+    bestTime: "6:30 AM – 10:30 AM (Soft morning light)",
+    fuelEst: "₹70 – ₹110",
+    mapQuery: "Talsari Beach, Balasore, Odisha",
+    img: "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=700&h=420&fit=crop&auto=format",
+    desc: "A calm, picturesque estuary where the sacred Subarnarekha River joins the Bay of Bengal in Odisha. Known for swaying palm trees, quiet backwaters, and traditional fishing boats.",
+    highlights: [
+      "Confluence where river meets the ocean",
+      "Vast casuarina pine groves & palm tree trails",
+      "Traditional wooden fishing boats resting on sand",
+      "Quiet mudflats with thousands of red fiddler crabs",
+    ],
+    insiderTip: "During low tide, the river mouth becomes shallow enough to walk across to the serene sand island on the other side.",
+    recommendedBikeId: 1,
+    recommendedBikeName: "Royal Enfield Classic 350",
   },
   {
     id: 4,
-    name: "Junput Beach",
-    distance: "30 km",
-    duration: "50 min",
+    name: "Mandarmani Beach (Drive-on Coast)",
+    tag: "Asia's Longest Beach Drive",
+    category: "Adventure",
+    distance: "32 km",
+    distanceKm: 32,
+    duration: "45 min",
+    difficulty: "Moderate",
+    roadCondition: "Smooth highway NH-116B + firm tidal sand at low tide",
+    bestTime: "Low Tide hours only (Strictly check tide table)",
+    fuelEst: "₹220 – ₹300",
+    mapQuery: "Mandarmani Beach, West Bengal",
+    img: "https://images.unsplash.com/photo-1578674735166-48bcaef9842b?w=700&h=420&fit=crop&auto=format",
+    desc: "One of Asia's longest drivable beach strips! 13 km of hard-packed sand where you can cruise right beside the breaking waves. Filled with lively beach cafes and water sports.",
+    highlights: [
+      "Legal beach riding on firm low-tide sand",
+      "Water sports: Parasailing, jet ski & ATV rides",
+      "Lively beach shacks, seafood & music",
+      "Unmatched panoramic ocean horizon",
+    ],
+    insiderTip: "Always confirm tide times with the Panda shop team before riding. Ride only on firm packed dark sand; avoid loose soft sand near dunes to prevent getting stuck.",
+    recommendedBikeId: 1,
+    recommendedBikeName: "Royal Enfield Classic 350",
+  },
+  {
+    id: 5,
+    name: "Tajpur Beach & Pine Groves",
+    tag: "Virgin Golden Sands",
+    category: "Beaches",
+    distance: "20 km",
+    distanceKm: 20,
+    duration: "30 min",
     difficulty: "Easy",
-    img: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=600&h=360&fit=crop&auto=format",
-    desc: "Mangrove groves and a secluded cove where dolphins occasionally swim close to shore.",
-    highlights: ["Mangrove walks", "Dolphin sightings", "Old lighthouse"],
+    roadCondition: "Scenic road flanked by pisciculture bheries (prawn farms)",
+    bestTime: "3:30 PM – 6:30 PM (Golden hour sunset)",
+    fuelEst: "₹140 – ₹190",
+    mapQuery: "Tajpur Beach, West Bengal",
+    img: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=700&h=420&fit=crop&auto=format",
+    desc: "A tranquil crescent beach secluded by thick casuarina pine forests. One of the cleanest beaches in Bengal, where thousands of red crabs make the shore blush red.",
+    highlights: [
+      "Pine forest coastal motorcycle trail",
+      "Red fiddler crabs carpeting the beach",
+      "Peaceful sunset reflection on wet sand",
+      "Beach paragliding and solitary wooden cafes",
+    ],
+    insiderTip: "The winding dirt path through the casuarina trees provides the best aesthetic backdrop for motorcycle photoshoot reels.",
+    recommendedBikeId: 2,
+    recommendedBikeName: "TVS Apache RTR 160",
+  },
+  {
+    id: 6,
+    name: "Shankarpur Fishing Harbour",
+    tag: "Deep Sea Port & Sunrise",
+    category: "Culture & Food",
+    distance: "15 km",
+    distanceKm: 15,
+    duration: "25 min",
+    difficulty: "Easy",
+    roadCondition: "Smooth coastal highway (NH-116B connector)",
+    bestTime: "5:30 AM – 8:00 AM (Morning fish auction)",
+    fuelEst: "₹110 – ₹160",
+    mapQuery: "Shankarpur Fishing Harbour, West Bengal",
+    img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=700&h=420&fit=crop&auto=format",
+    desc: "A major deep-sea fishing port on one side and a tranquil golden beach on the other. Witness hundreds of colorful trawlers unloading fresh deep-sea catch at dawn.",
+    highlights: [
+      "Exciting early morning wholesale fish auctions",
+      "Hundreds of colorful deep-sea trawler boats",
+      "Buy jumbo tiger prawns, hilsa & pomfret at harbor rates",
+      "Tranquil tree-lined shoreline walking track",
+    ],
+    insiderTip: "Arrive before 7 AM to witness the harbor at its liveliest when the boats return from the deep Bay of Bengal.",
+    recommendedBikeId: 5,
+    recommendedBikeName: "Royal Enfield Hunter 350",
+  },
+  {
+    id: 7,
+    name: "Bichitrapur Mangrove Sanctuary",
+    tag: "Eco Boat Safari (Odisha)",
+    category: "Nature",
+    distance: "16 km",
+    distanceKm: 16,
+    duration: "30 min",
+    difficulty: "Moderate",
+    roadCondition: "Rustic country roads through green fields and river crossings",
+    bestTime: "7:00 AM – 11:30 AM (High tide for boat rides)",
+    fuelEst: "₹120 – ₹170",
+    mapQuery: "Bichitrapur Mangrove Eco Tourism, Odisha",
+    img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=700&h=420&fit=crop&auto=format",
+    desc: "A protected ecological mangrove sanctuary on the Subarnarekha delta in Odisha. Take speedboats through winding mangrove creeks to a pristine offshore sand island.",
+    highlights: [
+      "Speedboat mangrove safari through creeks",
+      "Sanctuary for rare living-fossil Horseshoe Crabs",
+      "Coastal bird watching: Kingfishers, egrets & seagulls",
+      "Offshore sand spit island in the open sea",
+    ],
+    insiderTip: "Speedboats operate strictly based on water levels during tidal hours. Carry cash for the eco-tourism forest entry ticket.",
+    recommendedBikeId: 4,
+    recommendedBikeName: "Bajaj Pulsar NS200",
+  },
+  {
+    id: 8,
+    name: "Chandaneswar Shiva Temple",
+    tag: "Historic Pilgrimage (Odisha)",
+    category: "Culture & Food",
+    distance: "8 km",
+    distanceKm: 8,
+    duration: "15 min",
+    difficulty: "Easy",
+    roadCondition: "Clean interstate highway connecting Bengal to Odisha",
+    bestTime: "Morning 7:00 AM – 11:00 AM or Evening 5:00 PM",
+    fuelEst: "₹50 – ₹80",
+    mapQuery: "Chandaneswar Temple, Balasore, Odisha",
+    img: "https://images.unsplash.com/photo-1548013146-72479768bada?w=700&h=420&fit=crop&auto=format",
+    desc: "A historic 16th-century Lord Shiva temple venerated by pilgrims across Bengal and Odisha. Lined with bustling shops selling local sweets, brass temple bells, and handicrafts.",
+    highlights: [
+      "Classic Kalinga temple architecture",
+      "Spiritual interstate border pilgrimage ride",
+      "Freshly baked hot Chhena Poda & Khaja sweets",
+      "Bustling cultural bazaar and souvenir shops",
+    ],
+    insiderTip: "Don't leave without tasting the authentic hot Chhena Poda (sweet roasted cottage cheese cake) from the old sweet shops outside the temple gate.",
+    recommendedBikeId: 6,
+    recommendedBikeName: "Yamaha FZ-S V3",
   },
 ]
 
@@ -517,52 +698,325 @@ function FleetScreen({ setTab, setSelectedBike }: { setTab: SetTab; setSelectedB
 
 // ── Routes Screen ─────────────────────────────────────────────────────────────
 
-function RoutesScreen() {
-  const [detail, setDetail] = useState<(typeof ROUTES)[number] | null>(null)
+function getMapsSearchUrl(query: string) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
+}
 
+function getMapsDirectionsUrl(destination: string) {
+  return `https://www.google.com/maps/dir/?api=1&origin=Panda+Bike+Rental,+New+Digha,+West+Bengal&destination=${encodeURIComponent(destination)}`
+}
+
+function RoutesScreen({
+  setTab,
+  setSelectedBike,
+}: {
+  setTab?: SetTab
+  setSelectedBike?: SetBike
+}) {
+  const [detail, setDetail] = useState<RouteItem | null>(null)
+  const [activeCategory, setActiveCategory] = useState<string>("All")
+  const [distanceFilter, setDistanceFilter] = useState<string>("All")
+  const [searchQuery, setSearchQuery] = useState<string>("")
+
+  const categories = ["All", "Beaches", "Adventure", "Nature", "Culture & Food"]
+  const distanceOptions = ["All", "< 10 km", "10–25 km", "25+ km"]
+
+  const filteredRoutes = useMemo(() => {
+    return ROUTES.filter((r) => {
+      // Category filter
+      if (activeCategory !== "All" && r.category !== activeCategory) {
+        return false
+      }
+      // Distance filter
+      if (distanceFilter === "< 10 km" && r.distanceKm >= 10) return false
+      if (distanceFilter === "10–25 km" && (r.distanceKm < 10 || r.distanceKm > 25)) return false
+      if (distanceFilter === "25+ km" && r.distanceKm <= 25) return false
+
+      // Search query filter
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase()
+        const matchName = r.name.toLowerCase().includes(q)
+        const matchTag = r.tag.toLowerCase().includes(q)
+        const matchDesc = r.desc.toLowerCase().includes(q)
+        const matchHighlights = r.highlights.some((h) => h.toLowerCase().includes(q))
+        if (!matchName && !matchTag && !matchDesc && !matchHighlights) return false
+      }
+
+      return true
+    })
+  }, [activeCategory, distanceFilter, searchQuery])
+
+  // If viewing details of a specific route:
   if (detail) {
+    const recommendedBike = BIKES.find((b) => b.id === detail.recommendedBikeId) ?? BIKES[0]
+
     return (
-      <div className="flex flex-col">
-        <div className="relative h-56 md:h-80 bg-ink-raised flex-shrink-0">
-          <img src={detail.img} alt={detail.name} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent" />
-          <button
-            onClick={() => setDetail(null)}
-            className="absolute top-4 left-4 bg-black/40 backdrop-blur-sm text-white w-9 h-9 rounded-full flex items-center justify-center text-xl leading-none"
-          >
-            ‹
-          </button>
-        </div>
-        <div className="px-5 md:px-10 pt-4 pb-8">
-          <div className="md:max-w-2xl">
-            <div className="flex items-center gap-2 mb-2">
+      <div className="flex flex-col pb-12">
+        {/* Detail Hero Image */}
+        <div className="relative h-64 md:h-96 bg-ink-raised flex-shrink-0">
+          <img
+            src={detail.img}
+            alt={detail.name}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.src =
+                "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=450&fit=crop&auto=format"
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
+
+          {/* Top navigation row */}
+          <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+            <button
+              onClick={() => setDetail(null)}
+              className="bg-black/50 backdrop-blur-md text-white hover:bg-black/70 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-semibold border border-white/20 transition-colors"
+            >
+              <span>‹</span>
+              <span>All Routes</span>
+            </button>
+            <a
+              href={getMapsSearchUrl(detail.mapQuery)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-brand text-white hover:bg-brand/90 px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-semibold shadow-md transition-all active:scale-95"
+            >
+              <span>📍</span>
+              <span>Open in Maps</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </a>
+          </div>
+
+          {/* Hero text */}
+          <div className="absolute bottom-4 left-4 right-4 md:left-10 md:right-10">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <span className="bg-brand text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                {detail.category}
+              </span>
+              <span className="bg-white/20 backdrop-blur-sm text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
+                {detail.tag}
+              </span>
               <span
                 className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
                   detail.difficulty === "Easy"
-                    ? "bg-green-500/15 text-green-400"
-                    : "bg-amber-500/15 text-amber-400"
+                    ? "bg-green-500/20 text-green-300 border border-green-500/40"
+                    : detail.difficulty === "Scenic"
+                    ? "bg-blue-500/20 text-blue-300 border border-blue-500/40"
+                    : "bg-amber-500/20 text-amber-300 border border-amber-500/40"
                 }`}
               >
-                {detail.difficulty}
+                {detail.difficulty} Ride
               </span>
-              <span className="text-muted text-xs">{detail.distance} &nbsp;·&nbsp; {detail.duration}</span>
             </div>
-            <h1 className="font-display font-bold text-sand text-2xl md:text-3xl mb-3">{detail.name}</h1>
-            <p className="text-muted text-sm leading-relaxed mb-5">{detail.desc}</p>
-            <h3 className="text-sand font-semibold text-sm mb-3">Highlights</h3>
-            <div className="flex flex-col gap-2 mb-5">
+            <h1 className="font-display font-bold text-white text-2xl md:text-4xl leading-tight">
+              {detail.name}
+            </h1>
+            <p className="text-white/70 text-xs md:text-sm mt-1">
+              📍 {detail.distance} from Panda Hub &nbsp;·&nbsp; ⏱ ~{detail.duration} ride &nbsp;·&nbsp; ⛽ {detail.fuelEst}
+            </p>
+          </div>
+        </div>
+
+        {/* Content body */}
+        <div className="px-5 md:px-10 pt-5 md:pt-8 md:max-w-4xl">
+          {/* Primary Action Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 mb-6">
+            <a
+              href={getMapsSearchUrl(detail.mapQuery)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 bg-brand text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-[0_4px_16px_rgba(249,115,22,0.3)] hover:opacity-95 active:scale-[0.98] transition-all"
+            >
+              <span>📍</span>
+              <span>Open in Google Maps</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </a>
+
+            <a
+              href={getMapsDirectionsUrl(detail.mapQuery)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 bg-ink-card border border-brand/40 text-brand font-semibold text-sm py-3 px-4 rounded-xl hover:bg-brand/10 active:scale-[0.98] transition-all"
+            >
+              <span>🧭</span>
+              <span>Directions from Hub</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polygon points="3 11 22 2 13 21 11 13 3 11" />
+              </svg>
+            </a>
+
+            {setTab && setSelectedBike && (
+              <button
+                onClick={() => {
+                  setSelectedBike(recommendedBike)
+                  setTab("book")
+                }}
+                className="flex items-center justify-center gap-2 bg-ink-raised border border-ink-border text-sand font-semibold text-sm py-3 px-4 rounded-xl hover:border-brand transition-colors active:scale-[0.98]"
+              >
+                <span>🏍️</span>
+                <span>Rent {recommendedBike.name.split(" ")[0]} Bike</span>
+              </button>
+            )}
+          </div>
+
+          {/* Description */}
+          <div className="bg-ink-card border border-ink-border rounded-2xl p-4 md:p-6 mb-5">
+            <h2 className="text-sand font-semibold text-base mb-2">About this Destination</h2>
+            <p className="text-muted text-sm leading-relaxed">{detail.desc}</p>
+          </div>
+
+          {/* Key Trip Parameters Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <div className="bg-ink-card border border-ink-border rounded-xl p-3.5">
+              <span className="text-xs text-muted block mb-1">📏 Distance</span>
+              <span className="font-display font-bold text-sand text-base">{detail.distance}</span>
+              <span className="text-[10px] text-muted block mt-0.5">from New Digha</span>
+            </div>
+
+            <div className="bg-ink-card border border-ink-border rounded-xl p-3.5">
+              <span className="text-xs text-muted block mb-1">⏱ Riding Time</span>
+              <span className="font-display font-bold text-sand text-base">{detail.duration}</span>
+              <span className="text-[10px] text-muted block mt-0.5">one way avg</span>
+            </div>
+
+            <div className="bg-ink-card border border-ink-border rounded-xl p-3.5">
+              <span className="text-xs text-muted block mb-1">⏰ Best Timing</span>
+              <span className="font-display font-semibold text-brand text-xs block leading-tight">
+                {detail.bestTime.split("(")[0]}
+              </span>
+              <span className="text-[10px] text-muted block mt-0.5">Prime lighting</span>
+            </div>
+
+            <div className="bg-ink-card border border-ink-border rounded-xl p-3.5">
+              <span className="text-xs text-muted block mb-1">⛽ Est. Petrol</span>
+              <span className="font-display font-bold text-sand text-base">{detail.fuelEst}</span>
+              <span className="text-[10px] text-muted block mt-0.5">round trip</span>
+            </div>
+          </div>
+
+          {/* Road Condition & Surface */}
+          <div className="bg-ink-raised border border-ink-border rounded-xl p-4 mb-5 flex items-start gap-3">
+            <span className="text-xl">🛣️</span>
+            <div>
+              <p className="text-sand font-semibold text-xs mb-0.5">Road Surface & Route Terrain</p>
+              <p className="text-muted text-xs leading-relaxed">{detail.roadCondition}</p>
+            </div>
+          </div>
+
+          {/* Highlights checklist */}
+          <div className="mb-6">
+            <h3 className="font-display font-bold text-sand text-base mb-3">Trip Highlights & Sights</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
               {detail.highlights.map((h) => (
                 <div key={h} className="flex items-center gap-3 bg-ink-card border border-ink-border rounded-xl px-4 py-3">
-                  <span className="text-brand text-sm">✦</span>
-                  <span className="text-sand text-sm">{h}</span>
+                  <span className="w-6 h-6 rounded-full bg-brand/15 text-brand flex items-center justify-center text-xs flex-shrink-0 font-bold">
+                    ✓
+                  </span>
+                  <span className="text-sand text-xs md:text-sm font-medium">{h}</span>
                 </div>
               ))}
             </div>
-            <div className="bg-ink-card border border-brand/25 rounded-2xl p-4">
-              <p className="text-brand text-xs font-bold mb-1">Recommended Bikes</p>
-              <p className="text-muted text-xs leading-relaxed">
-                Royal Enfield Classic 350 or TVS Apache RTR 160 are ideal for this coastal stretch.
-              </p>
+          </div>
+
+          {/* Insider Panda Tip */}
+          <div className="bg-brand/10 border border-brand/30 rounded-2xl p-4 md:p-5 mb-6">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-base">💡</span>
+              <p className="text-brand font-bold text-xs uppercase tracking-wider">Panda Rider's Insider Tip</p>
+            </div>
+            <p className="text-sand/90 text-xs md:text-sm leading-relaxed">{detail.insiderTip}</p>
+          </div>
+
+          {/* GPS Waypoint Card */}
+          <div className="bg-ink-card border border-ink-border rounded-2xl p-4 md:p-5 mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🗺️</span>
+                <h3 className="text-sand font-semibold text-sm">GPS Waypoints</h3>
+              </div>
+              <a
+                href={getMapsSearchUrl(detail.mapQuery)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand hover:underline text-xs font-semibold flex items-center gap-1"
+              >
+                <span>View Live Pin</span>
+                <span>↗</span>
+              </a>
+            </div>
+
+            <div className="relative pl-6 pb-2 border-l-2 border-brand/30 ml-2 space-y-4">
+              <div className="relative">
+                <span className="absolute -left-[31px] -top-0.5 w-4 h-4 rounded-full bg-brand flex items-center justify-center text-[9px] text-white font-bold">
+                  ●
+                </span>
+                <p className="text-sand text-xs font-bold">Start: Panda Bike Rental Hub</p>
+                <p className="text-muted text-[11px]">New Digha Town, West Bengal (Helmets & papers handed over)</p>
+              </div>
+
+              <div className="relative">
+                <span className="absolute -left-[31px] -top-0.5 w-4 h-4 rounded-full bg-ink-border border-2 border-brand flex items-center justify-center text-[9px]"></span>
+                <p className="text-sand text-xs font-bold">Trail: {detail.roadCondition}</p>
+                <p className="text-muted text-[11px]">{detail.distance} · approx. {detail.duration}</p>
+              </div>
+
+              <div className="relative">
+                <span className="absolute -left-[31px] -top-0.5 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center text-[9px] text-white font-bold">
+                  ★
+                </span>
+                <p className="text-green-400 text-xs font-bold">Destination: {detail.name}</p>
+                <p className="text-muted text-[11px]">{detail.mapQuery}</p>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-ink-border flex gap-3">
+              <a
+                href={getMapsDirectionsUrl(detail.mapQuery)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-ink-raised hover:bg-brand/10 border border-ink-border hover:border-brand/40 text-sand hover:text-brand text-xs font-semibold py-2.5 rounded-xl text-center transition-colors"
+              >
+                🧭 Launch Google Maps Navigation
+              </a>
+            </div>
+          </div>
+
+          {/* Recommended Fleet Bike */}
+          <div className="bg-ink-card border border-brand/30 rounded-2xl p-4 md:p-5">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-brand text-xs font-bold uppercase tracking-wider">Recommended Bike for this Route</p>
+              <span className="text-xs text-muted">Ideal power & suspension</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="w-24 h-18 rounded-xl overflow-hidden bg-ink-raised flex-shrink-0">
+                <img src={recommendedBike.img} alt={recommendedBike.name} className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sand font-semibold text-sm truncate">{recommendedBike.name}</h4>
+                <p className="text-brand font-bold text-sm mt-0.5">
+                  ₹{recommendedBike.price}
+                  <span className="text-muted font-normal text-xs">/day</span>
+                  <span className="text-muted text-xs ml-2">· {recommendedBike.fuel}</span>
+                </p>
+                {setTab && setSelectedBike && (
+                  <button
+                    onClick={() => {
+                      setSelectedBike(recommendedBike)
+                      setTab("book")
+                    }}
+                    className="mt-2 text-xs bg-brand text-white font-semibold px-4 py-1.5 rounded-lg active:opacity-90"
+                  >
+                    Book This Bike
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -570,80 +1024,366 @@ function RoutesScreen() {
     )
   }
 
+  // Main Explore Page View:
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pb-12">
+      {/* Page Header */}
       <div className="px-5 md:px-10 pt-5 md:pt-8 pb-3">
-        <h1 className="font-display font-bold text-sand text-2xl md:text-3xl">Explore Digha</h1>
-        <p className="text-muted text-sm mt-1">Top rides from New Digha town</p>
-      </div>
-
-      {/* Featured card */}
-      <div className="px-5 md:px-10 mb-4">
-        <div
-          className="relative h-52 md:h-72 rounded-2xl overflow-hidden cursor-pointer"
-          onClick={() => setDetail(ROUTES[2])}
-        >
-          <img src={ROUTES[2].img} alt={ROUTES[2].name} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15" />
-          <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
-            <span className="bg-brand text-white text-[10px] font-bold px-2.5 py-1 rounded-full mb-2 inline-block">
-              ✦ Featured Route
-            </span>
-            <h3 className="font-display font-bold text-white text-xl md:text-2xl mt-1">{ROUTES[2].name}</h3>
-            <p className="text-white/65 text-xs md:text-sm mt-0.5">
-              {ROUTES[2].distance} &nbsp;·&nbsp; {ROUTES[2].duration} &nbsp;·&nbsp; {ROUTES[2].difficulty}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="bg-brand/15 text-brand text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                Rider's Guide · Digha
+              </span>
+              <span className="text-muted text-xs">8 Iconic Destinations</span>
+            </div>
+            <h1 className="font-display font-bold text-sand text-2xl md:text-4xl">Explore Nearby Digha</h1>
+            <p className="text-muted text-xs md:text-sm mt-1">
+              Curated motorcycle routes, beach trails, estuaries & Odisha border rides with direct Google Maps GPS
             </p>
           </div>
         </div>
       </div>
 
-      {/* Route list — 1 col mobile, 2 col desktop */}
-      <div className="px-5 md:px-10 grid grid-cols-1 md:grid-cols-2 gap-3">
-        {ROUTES.map((route) => (
+      {/* Search Bar */}
+      <div className="px-5 md:px-10 mb-4">
+        <div className="relative">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by destination, beach, red crabs, sand ride, temple..."
+            className="w-full bg-ink-card border border-ink-border text-sand rounded-xl pl-10 pr-10 py-3 text-xs md:text-sm placeholder:text-muted/50 focus:outline-none focus:border-brand"
+          />
+          <span className="absolute left-3.5 top-3.5 text-muted text-sm">🔍</span>
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3.5 top-3 text-muted hover:text-sand text-xs p-1"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Category Pills */}
+      <div className="flex gap-2 overflow-x-auto no-scrollbar px-5 md:px-10 pb-2">
+        {categories.map((c) => (
           <button
-            key={route.id}
-            onClick={() => setDetail(route)}
-            className="bg-ink-card border border-ink-border rounded-2xl overflow-hidden flex text-left"
+            key={c}
+            onClick={() => setActiveCategory(c)}
+            className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+              activeCategory === c
+                ? "bg-brand text-white border-brand shadow-[0_2px_8px_rgba(249,115,22,0.35)]"
+                : "bg-ink-card text-muted border-ink-border hover:border-muted/30"
+            }`}
           >
-            <div className="w-28 md:w-36 h-24 md:h-28 flex-shrink-0 bg-ink-raised">
-              <img src={route.img} alt={route.name} className="w-full h-full object-cover" />
-            </div>
-            <div className="p-3 flex flex-col justify-center flex-1 min-w-0">
-              <h3 className="text-sand font-semibold text-sm leading-tight mb-1 truncate">{route.name}</h3>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-muted text-xs">📍 {route.distance}</span>
-                <span className="text-muted text-xs">⏱ {route.duration}</span>
-              </div>
-              <span
-                className={`text-[11px] font-semibold w-fit px-2 py-0.5 rounded-full ${
-                  route.difficulty === "Easy"
-                    ? "bg-green-500/12 text-green-400"
-                    : "bg-amber-500/12 text-amber-400"
-                }`}
-              >
-                {route.difficulty}
-              </span>
-            </div>
-            <div className="flex items-center pr-4 text-muted text-xl">›</div>
+            {c}
           </button>
         ))}
       </div>
 
-      {/* Riding tips */}
-      <div className="mx-5 md:mx-10 my-5 bg-ink-card border border-ink-border rounded-2xl p-4">
-        <h3 className="text-sand font-semibold text-sm mb-3">🏍 Riding Tips for Digha</h3>
-        <div className="flex flex-col gap-2">
-          {[
-            "Carry valid DL and Aadhaar ID while riding",
-            "Best riding hours: 6–9 AM and 4–7 PM",
-            "Petrol pumps available on all major routes",
-            "Avoid NH-116B during evening peak hours",
-          ].map((tip, i) => (
-            <p key={i} className="text-muted text-xs leading-relaxed flex gap-2">
-              <span className="text-brand flex-shrink-0">•</span>
-              {tip}
+      {/* Distance Pills */}
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar px-5 md:px-10 pb-4 pt-1 text-xs">
+        <span className="text-muted text-[11px] flex-shrink-0">Radius:</span>
+        {distanceOptions.map((d) => (
+          <button
+            key={d}
+            onClick={() => setDistanceFilter(d)}
+            className={`flex-shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-colors ${
+              distanceFilter === d
+                ? "bg-ink-raised text-sand border-brand/50"
+                : "bg-transparent text-muted border-ink-border hover:border-ink-border/80"
+            }`}
+          >
+            {d}
+          </button>
+        ))}
+      </div>
+
+      {/* Featured Route Banner: Mandarmani Beach */}
+      {activeCategory === "All" && !searchQuery && distanceFilter === "All" && (
+        <div className="px-5 md:px-10 mb-6">
+          <div className="relative rounded-2xl md:rounded-3xl overflow-hidden bg-ink-card border border-brand/30 shadow-lg">
+            <div className="relative h-56 md:h-72">
+              <img
+                src={ROUTES[3].img}
+                alt={ROUTES[3].name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/15" />
+
+              <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+                <span className="bg-brand text-white text-[10px] md:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow">
+                  🔥 Rider's Choice Featured Route
+                </span>
+                <span className="bg-black/50 backdrop-blur-sm text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
+                  {ROUTES[3].tag}
+                </span>
+              </div>
+
+              <div className="absolute bottom-4 left-4 right-4 md:left-6 md:right-6">
+                <h3 className="font-display font-bold text-white text-xl md:text-3xl">
+                  {ROUTES[3].name}
+                </h3>
+                <p className="text-white/80 text-xs md:text-sm line-clamp-1 mt-1">
+                  {ROUTES[3].desc}
+                </p>
+                <div className="flex flex-wrap items-center gap-3 text-white/90 text-xs mt-2.5">
+                  <span>📍 {ROUTES[3].distance}</span>
+                  <span>⏱ {ROUTES[3].duration}</span>
+                  <span>⛽ {ROUTES[3].fuelEst}</span>
+                  <span className="bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded text-[10px] font-bold">
+                    {ROUTES[3].difficulty}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick action bar */}
+            <div className="p-3.5 md:p-4 bg-ink-card flex flex-wrap items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2">
+                <a
+                  href={getMapsSearchUrl(ROUTES[3].mapQuery)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-brand text-white hover:bg-brand/90 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
+                >
+                  <span>📍</span>
+                  <span>Open in Maps</span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+
+                <a
+                  href={getMapsDirectionsUrl(ROUTES[3].mapQuery)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-ink-raised border border-ink-border hover:border-brand/40 text-sand hover:text-brand px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                >
+                  <span>🧭</span>
+                  <span>Directions</span>
+                </a>
+              </div>
+
+              <button
+                onClick={() => setDetail(ROUTES[3])}
+                className="text-brand text-xs font-semibold hover:underline flex items-center gap-1 ml-auto"
+              >
+                <span>View Route Guide & Tips</span>
+                <span>›</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Routes Grid Header */}
+      <div className="px-5 md:px-10 mb-3 flex items-center justify-between">
+        <h2 className="font-display font-bold text-sand text-lg md:text-xl">
+          {activeCategory === "All" ? "All Locations" : activeCategory}
+          <span className="text-muted font-normal text-xs ml-2">({filteredRoutes.length} found)</span>
+        </h2>
+      </div>
+
+      {/* Empty State */}
+      {filteredRoutes.length === 0 && (
+        <div className="px-5 md:px-10 py-12 text-center bg-ink-card border border-ink-border rounded-2xl mx-5 md:mx-10">
+          <p className="text-2xl mb-2">🔍</p>
+          <p className="text-sand font-semibold text-sm">No destinations found matching "{searchQuery}"</p>
+          <p className="text-muted text-xs mt-1">Try searching for "beach", "crab", "temple", or clear filters.</p>
+          <button
+            onClick={() => {
+              setSearchQuery("")
+              setActiveCategory("All")
+              setDistanceFilter("All")
+            }}
+            className="mt-4 bg-brand text-white text-xs font-semibold px-4 py-2 rounded-xl"
+          >
+            Reset Filters
+          </button>
+        </div>
+      )}
+
+      {/* Route Cards Grid */}
+      <div className="px-5 md:px-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        {filteredRoutes.map((route) => (
+          <div
+            key={route.id}
+            className="bg-ink-card border border-ink-border hover:border-brand/40 rounded-2xl overflow-hidden flex flex-col transition-all duration-200 group"
+          >
+            {/* Card Thumbnail */}
+            <div
+              className="relative h-44 bg-ink-raised overflow-hidden cursor-pointer"
+              onClick={() => setDetail(route)}
+            >
+              <img
+                src={route.img}
+                alt={route.name}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                onError={(e) => {
+                  e.currentTarget.src =
+                    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=700&h=420&fit=crop&auto=format"
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
+
+              {/* Badges on top */}
+              <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+                <span className="bg-brand text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow">
+                  {route.category}
+                </span>
+                <span
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-md ${
+                    route.difficulty === "Easy"
+                      ? "bg-green-500/30 text-green-300 border border-green-500/40"
+                      : route.difficulty === "Scenic"
+                      ? "bg-blue-500/30 text-blue-300 border border-blue-500/40"
+                      : "bg-amber-500/30 text-amber-300 border border-amber-500/40"
+                  }`}
+                >
+                  {route.difficulty}
+                </span>
+              </div>
+
+              {/* Distance pill on bottom right */}
+              <div className="absolute bottom-2.5 right-3 bg-black/60 backdrop-blur-sm rounded-full px-2.5 py-1 border border-white/10">
+                <span className="text-white text-xs font-semibold">📍 {route.distance}</span>
+              </div>
+
+              <div className="absolute bottom-2.5 left-3">
+                <span className="text-white/80 text-[10px] font-medium bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded">
+                  ⏱ ~{route.duration}
+                </span>
+              </div>
+            </div>
+
+            {/* Card Content */}
+            <div className="p-4 flex flex-col flex-1">
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <div>
+                  <h3
+                    onClick={() => setDetail(route)}
+                    className="font-display font-bold text-sand text-base leading-snug group-hover:text-brand transition-colors cursor-pointer"
+                  >
+                    {route.name}
+                  </h3>
+                  <p className="text-brand text-xs font-medium">{route.tag}</p>
+                </div>
+              </div>
+
+              <p className="text-muted text-xs leading-relaxed line-clamp-2 mb-3">
+                {route.desc}
+              </p>
+
+              {/* Highlights pills */}
+              <div className="flex flex-wrap gap-1.5 mb-4 mt-auto">
+                {route.highlights.slice(0, 2).map((h) => (
+                  <span
+                    key={h}
+                    className="text-[10px] text-muted/90 bg-ink-raised border border-ink-border px-2 py-0.5 rounded-md truncate max-w-[200px]"
+                  >
+                    • {h}
+                  </span>
+                ))}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-3 border-t border-ink-border flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5">
+                  {/* Open in Google Maps Link */}
+                  <a
+                    href={getMapsSearchUrl(route.mapQuery)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={`Open ${route.name} on Google Maps`}
+                    className="bg-brand/15 hover:bg-brand text-brand hover:text-white border border-brand/30 hover:border-transparent px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all active:scale-95"
+                  >
+                    <span>📍</span>
+                    <span>Maps</span>
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                      <polyline points="15 3 21 3 21 9" />
+                      <line x1="10" y1="14" x2="21" y2="3" />
+                    </svg>
+                  </a>
+
+                  {/* Directions Link */}
+                  <a
+                    href={getMapsDirectionsUrl(route.mapQuery)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Get Directions from Panda Hub"
+                    className="bg-ink-raised hover:bg-ink-border text-muted hover:text-sand px-2.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors"
+                  >
+                    <span>🧭</span>
+                    <span className="hidden sm:inline">Nav</span>
+                  </a>
+                </div>
+
+                <button
+                  onClick={() => setDetail(route)}
+                  className="text-brand hover:underline text-xs font-semibold flex items-center gap-1"
+                >
+                  <span>Details</span>
+                  <span>›</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Local Rider's Handbook for Digha Coast */}
+      <div className="mx-5 md:mx-10 bg-ink-card border border-ink-border rounded-2xl p-5 md:p-6 mb-4">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-xl">🏍️</span>
+          <div>
+            <h3 className="font-display font-bold text-sand text-base md:text-lg">
+              Digha Coastal Rider's Safety & Handbook
+            </h3>
+            <p className="text-muted text-xs">Essential local knowledge before starting your ride</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 mt-4">
+          <div className="bg-ink-raised border border-ink-border rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2 text-brand font-bold text-xs">
+              <span>🌊</span>
+              <span>Tides & Beach Riding</span>
+            </div>
+            <p className="text-muted text-xs leading-relaxed">
+              Never take your motorcycle into wet sea water or loose tidal mud. When visiting Mandarmani or Udaipur, ride only during low tide hours on firm packed sand.
             </p>
-          ))}
+          </div>
+
+          <div className="bg-ink-raised border border-ink-border rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2 text-brand font-bold text-xs">
+              <span>🛂</span>
+              <span>Odisha Border Guidelines</span>
+            </div>
+            <p className="text-muted text-xs leading-relaxed">
+              Riding to Talsari, Bichitrapur or Chandaneswar crosses into Odisha state. Helmets are mandatory for both rider and pillion. All Panda bikes come with full legal papers.
+            </p>
+          </div>
+
+          <div className="bg-ink-raised border border-ink-border rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2 text-brand font-bold text-xs">
+              <span>🛠️</span>
+              <span>24/7 Breakdown Assistance</span>
+            </div>
+            <p className="text-muted text-xs leading-relaxed">
+              If you experience a flat tire or mechanical issue along your route, call our on-road assistance at{" "}
+              <a href="tel:+919876543210" className="text-brand font-semibold underline">
+                +91 98765 43210
+              </a>
+              .
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -1337,7 +2077,7 @@ export default function App() {
           <div className="flex-1 overflow-y-auto no-scrollbar min-h-0">
             {tab === "home" && <HomeScreen setTab={goTo} />}
             {tab === "fleet" && <FleetScreen setTab={goTo} setSelectedBike={setSelectedBike} />}
-            {tab === "routes" && <RoutesScreen />}
+            {tab === "routes" && <RoutesScreen setTab={goTo} setSelectedBike={setSelectedBike} />}
             {tab === "book" && <BookScreen selectedBike={selectedBike} />}
           </div>
 
